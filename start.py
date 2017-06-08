@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import hashlib, platform
+import platform, requests, json
 class bcolors:
     HEADER = '\033[95m'
     BLUE = '\033[94m'
@@ -37,7 +37,7 @@ def Print(txt,col=None):
         ccolor = bcolors.ORANGE
     elif col == 'blue':
         ccolor = bcolors.cyan
-    print ccolor+txt+bcolors.ENDC
+    print(ccolor+txt+bcolors.ENDC)
 banner  = "" \
 "     __    __   __   __   __   ________   ______    \n" \
 "    |##|  |##| |##| |##| |##| |########| |######|   \n" \
@@ -47,22 +47,22 @@ banner  = "" \
 "    |###/\###| |##| |##| |##|    |##|    |##|___    \n" \
 "    |__/  \__| |__| |__| |__|    |__|    |______|   \n" \
 "                __                                    \n" \
-"               |  |             _______   __   __              _______      ______      \n" \
-"               |  |     /\     |   ____| |  | |  |     /\     |   __  \    /  ___ |     \n" \
-"               |  |    /  \    |  |  __  |  | |  |    /  \    |  | _\  \  |  |___\|     \n" \
-"           __  |  |   /    \   |  | /_ | |  | |  |   /    \   |  | \  /    \___  \      \n" \
-"          |  |_|  |  /  /\  \  |  |__| | |  |_|  |  /  /\  \  |  |  \  \  |\___|  |     \n" \
-"          |_______| /__/  \__\ |_______| |_______| /__/  \__\ |__|   \__\ |______/      \n" \
-"                                                                                        \n" \
-"                                                           Mario Robles, Costa Rica     \n" \
-"                                                                                        \n"
+"               |  |             _______   __   __              _______      ______ \n" \
+"               |  |     /\     |   ____| |  | |  |     /\     |   __  \    /  ___ |\n" \
+"               |  |    /  \    |  |  __  |  | |  |    /  \    |  | _\  \  |  |___\|\n" \
+"           __  |  |   /    \   |  | /_ | |  | |  |   /    \   |  | \  /    \___  \ \n" \
+"          |  |_|  |  /  /\  \  |  |__| | |  |_|  |  /  /\  \  |  |  \  \  |\___|  |\n" \
+"          |_______| /__/  \__\ |_______| |_______| /__/  \__\ |__|   \__\ |______/ \n" \
+"                                                                                   \n" \
+"                                                           AppSec S.C, Costa Rica  \n" \
+"                                                                                   \n"
 Print(banner,"blue")
-Print("Cual es el codigo de la pregunta ?","red")
-Print(" [ ! ] Solo numeros, sin espacios ni caracteres del alfabeto","orange")
-nombre = raw_input("Codigo : ")
-hash_object = hashlib.sha256(nombre.encode())
-hex_dig = hash_object.hexdigest()
-Print("\nSu respuesta es: "+bcolors.RED+ hex_dig+"\n","blue")
-print("**********************************************************************************************")
-print("* "+bcolors.cyan+"Recuerde que si brinda datos diferentes la respuesta puede ser considerada como incorrecta"+bcolors.ENDC+" *")
-print("**********************************************************************************************")
+try:
+    r = requests.get('https://raw.githubusercontent.com/whitejaguars/eh_training/master/updates/autoupdater.json')
+    version_data = json.loads(r.text)
+    if version_data["version"] != "1.0":
+        #First release
+        Print("[ ! ] Downloading updates","green")
+except Exception:
+    Print("[ X ] Error checking for updates, make sure you have a working internet connection","red")
+
