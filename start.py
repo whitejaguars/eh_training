@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from updates.updater import updater as updater
 import platform, requests, json
 class bcolors:
     HEADER = '\033[95m'
@@ -57,12 +58,36 @@ banner  = "" \
 "                                                           AppSec S.C, Costa Rica  \n" \
 "                                                                                   \n"
 Print(banner,"blue")
+with open("updates/autoupdater.json") as data_file:   
+    try: 
+        cversion = json.loads(data_file.read())
+        version=cversion["version"]
+    except Exception as e:
+        print("[ X ] Invalid format in json data: "+e.message)
+        exit()
+
 try:
     r = requests.get('https://raw.githubusercontent.com/whitejaguars/eh_training/master/updates/autoupdater.json')
     version_data = json.loads(r.text)
-    if version_data["version"] != "1.0":
+    Print("[ ! ] Current version: "+version,"green")
+    if version_data["version"] != version:
         #First release
-        Print("[ ! ] Downloading updates","green")
+        if '.' in version_data["version"]:
+            major, minor = version_data["version"].split(".")
+            cmajor, cminor = version.split(".")
+            Print("[ ! ] Downloading updates","green")
+            if cmajor != major:
+                Print("[ ! ] Downloading major update","green")
+                r = requests.get('https://raw.githubusercontent.com/whitejaguars/eh_training/master/updates/'+major+'.0.json')
+                update_data = json.loads(r.text)
+                updater.download(update_data)
+            if cminor != minor:
+                for i in range(cminor,minor):
+                    r = requests.get('https://raw.githubusercontent.com/whitejaguars/eh_training/master/updates/'+major+'.0.json')
+                    update_data = json.loads(r.text)
+                    updater.download(update_data)
+        else:
+            Print("[ X ] Version data is invalid: "+version_data["version"])
 except Exception:
     Print("[ X ] Error checking for updates, make sure you have a working internet connection","red")
 
